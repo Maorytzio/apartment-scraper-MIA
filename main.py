@@ -60,15 +60,29 @@ rent_data = json.loads(rent_data)
 
 # print(rent_data["props"]["pageProps"]["searchPageState"]["cat1"]["searchResults"]["listResults"])
 
-
+#
 results_list = rent_data["props"]["pageProps"]["searchPageState"]["cat1"]["searchResults"]["listResults"]
 
 all_links = []
+all_addresses = []
+all_prices = []
 for link in results_list:
+
+    address = link["address"]
+    all_addresses.append(address)
+
+    if "units" in link and link["units"]:
+        price = link["units"][0]["price"]
+    else:
+        price = 0
+    all_prices.append(price)
+
     pure_link = link["detailUrl"]
     if "http" not in pure_link:
         all_links.append(f"https://www.zillow.com{pure_link}")
     else:
         all_links.append(pure_link)
-print(all_links)
 
+print(len(all_links))
+print(len(all_addresses))
+print(len(all_prices))
