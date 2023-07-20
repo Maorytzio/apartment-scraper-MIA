@@ -52,26 +52,23 @@ rent_data = rent_data.replace("<!--", "")
 rent_data = rent_data.replace("-->", "")
 rent_data = json.loads(rent_data)
 
-# print(rent_data["props"]["pageProps"]["searchPageState"]["cat1"]["searchResults"]["listResults"])
-
-#
 results_list = rent_data["props"]["pageProps"]["searchPageState"]["cat1"]["searchResults"]["listResults"]
 
 all_links = []
 all_addresses = []
 all_prices = []
-for link in results_list:
+for apt in results_list:
 
-    address = link["address"]
+    address = apt["address"]
     all_addresses.append(address)
 
-    if "units" in link and link["units"]:
-        price = link["units"][0]["price"].strip("+")
+    if "units" in apt and apt["units"]:
+        price = apt["units"][0]["price"].strip("+")
     else:
         price = 0
     all_prices.append(price)
 
-    pure_link = link["detailUrl"]
+    pure_link = apt["detailUrl"]
     if "http" not in pure_link:
         all_links.append(f"https://www.zillow.com{pure_link}")
     else:
@@ -92,17 +89,22 @@ for i in range(len(all_links)):
                                             '1]/div/div[1]/input')
     price = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[2]/div[2]/div/div/div[2]/div/div['
                                           '1]/div/div[1]/input')
-    link = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[2]/div[3]/div/div/div[2]/div/div['
-                                         '1]/div/div[1]/input')
+    apt = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[2]/div[3]/div/div/div[2]/div/div['
+                                        '1]/div/div[1]/input')
 
     submit_button = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[3]/div[1]/div[1]/div/span/span')
 
     address.send_keys(all_addresses[i])
     price.send_keys(all_prices[i])
-    link.send_keys(all_links[i])
+    apt.send_keys(all_links[i])
 
     submit_button.click()
 
-# TODO: send data to spread shit
+driver.quit()
 
-# response_button_xpath = '//*[@id="tJHJj"]/div[3]/div[1]/div/div[2]/span/div/text()'
+# send data to spreadsheet
+driver.get('https://docs.google.com/forms/d/1KUrM_v9mHUZRewRZ3knaiO99qEAVToI2ABdGp6eJiek/edit#responses')
+driver.find_element(By.XPATH,
+                    '//*[@id="ResponsesView"]/div/div[1]/div[1]/div[2]/div[1]/div[1]/div/span/span[2]').click()
+
+driver.close()
