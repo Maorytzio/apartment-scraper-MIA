@@ -14,14 +14,14 @@ def init_driver():
     chrome_driver_path = "C:\Development\chromedriver.exe"
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
-    driver = webdriver.Chrome(options=options)
-    return driver
+    drivr = webdriver.Chrome(options=options)
+    return drivr
 
-
-# driver = init_driver()
 
 GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSfn9kDZIbMzlKk-PVxW01SEqJA-S6KjYvLH4VHvWkj9vpWG2A/" \
                    "viewform?usp=sf_link"
+
+LINK_FOR_TO_SHEET = "https://docs.google.com/forms/d/1KUrM_v9mHUZRewRZ3knaiO99qEAVToI2ABdGp6eJiek/edit#responses"
 
 ZILLOW_URL = "https://www.zillow.com/miami-fl/rentals/?searchQueryState=%7B%22pagination%22%3A%7B%7D%2C%22mapBounds" \
              "%22%3A%7B%22north%22%3A25.879527583425485%2C%22east%22%3A-80.07785136572265%2C%22south%22%3A25" \
@@ -32,12 +32,6 @@ ZILLOW_URL = "https://www.zillow.com/miami-fl/rentals/?searchQueryState=%7B%22pa
              "%3A%7B%22value%22%3Afalse%7D%2C%22cmsn%22%3A%7B%22value%22%3Afalse%7D%2C%22fsba%22%3A%7B%22value%22" \
              "%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A12700%2C" \
              "%22regionType%22%3A6%7D%5D%2C%22usersSearchTerm%22%3A%22Miami%20FL%22%2C%22mapZoom%22%3A11%7D"
-
-# driver.get(ZILLOW_URL)
-# links_elements = driver.find_elements(By.XPATH, '//*[@id="swipeable"]/div[1]/a')
-# links = [link.get_attribute('href') for link in links_elements]
-# print(links)
-
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 "
@@ -72,7 +66,7 @@ for link in results_list:
     all_addresses.append(address)
 
     if "units" in link and link["units"]:
-        price = link["units"][0]["price"]
+        price = link["units"][0]["price"].strip("+")
     else:
         price = 0
     all_prices.append(price)
@@ -83,6 +77,32 @@ for link in results_list:
     else:
         all_links.append(pure_link)
 
-print(len(all_links))
-print(len(all_addresses))
-print(len(all_prices))
+# print(len(all_links))
+# print(all_addresses)
+# print(all_prices)
+
+
+driver = init_driver()
+for i in range(len(all_links)):
+    # Substitute your own Google Form URL here 👇
+    driver.get(GOOGLE_FORM_LINK)
+
+    time.sleep(2)
+    address = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[2]/div[1]/div/div/div[2]/div/div['
+                                            '1]/div/div[1]/input')
+    price = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[2]/div[2]/div/div/div[2]/div/div['
+                                          '1]/div/div[1]/input')
+    link = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[2]/div[3]/div/div/div[2]/div/div['
+                                         '1]/div/div[1]/input')
+
+    submit_button = driver.find_element(By.XPATH, '//*[@id="mG61Hd"]/div[2]/div/div[3]/div[1]/div[1]/div/span/span')
+
+    address.send_keys(all_addresses[i])
+    price.send_keys(all_prices[i])
+    link.send_keys(all_links[i])
+
+    submit_button.click()
+
+# TODO: send data to spread shit
+
+# response_button_xpath = '//*[@id="tJHJj"]/div[3]/div[1]/div/div[2]/span/div/text()'
