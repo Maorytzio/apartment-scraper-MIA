@@ -74,10 +74,6 @@ for apt in results_list:
     else:
         all_links.append(pure_link)
 
-# print(len(all_links))
-# print(all_addresses)
-# print(all_prices)
-
 
 driver = init_driver()
 for i in range(len(all_links)):
@@ -104,7 +100,9 @@ driver.quit()
 
 # send data to spreadsheet
 driver.get('https://docs.google.com/forms/d/1KUrM_v9mHUZRewRZ3knaiO99qEAVToI2ABdGp6eJiek/edit#responses')
+driver.implicitly_wait(2)
 driver.find_element(By.XPATH,
                     '//*[@id="ResponsesView"]/div/div[1]/div[1]/div[2]/div[1]/div[1]/div/span/span[2]').click()
+driver.implicitly_wait(5)
 
-driver.close()
+driver.quit()
